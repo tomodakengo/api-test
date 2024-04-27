@@ -48,13 +48,14 @@ class TaskController extends Controller
      *             @OA\Property(property="description", type="string", example="Description of New Task")
      *         )
      *     ),
-     *     @OA\Response(
-     *         response=201,
-     *         description="タスクが正常に作成されました",
-     *         @OA\JsonContent(
-     *             @OA\Property(property="message", type="string", example="タスクが正常に作成されました")
-     *         )
-     *     )
+    *     @OA\Response(
+    *         response=201,
+    *         description="タスクが正常に作成されました",
+    *         @OA\JsonContent(
+    *             @OA\Property(property="message", type="string", example="タスクが正常に作成されました"),
+    *             @OA\Property(property="task", ref="#/components/schemas/Task")
+    *         )
+    *     )
      * )
      */
     public function store(Request $request)
@@ -69,7 +70,10 @@ class TaskController extends Controller
         $task->description = $request->description;
         $task->save();
 
-        return response()->json(['message' => 'タスクが正常に作成されました'], 201);
+        return response()->json([
+            'message' => 'タスクが正常に作成されました',
+            'task' => $task
+        ], 201);
     }
 
     /**
@@ -145,13 +149,14 @@ class TaskController extends Controller
      *             @OA\Property(property="description", type="string", example="Description of Updated Task")
      *         )
      *     ),
-     *     @OA\Response(
-     *         response=200,
-     *         description="タスクが正常に更新されました",
-     *         @OA\JsonContent(
-     *             @OA\Property(property="message", type="string", example="タスクが正常に更新されました")
-     *         )
-     *     )
+    *     @OA\Response(
+    *         response=200,
+    *         description="タスクが正常に更新されました",
+    *         @OA\JsonContent(
+    *             @OA\Property(property="message", type="string", example="タスクが正常に更新されました"),
+    *             @OA\Property(property="task", ref="#/components/schemas/Task")
+    *         )
+    *     )
      * )
      */
     public function update(Request $request, $id)
@@ -166,7 +171,10 @@ class TaskController extends Controller
         $task->description = $request->description;
         $task->save();
 
-        return response()->json(['message' => 'タスクが正常に更新されました']);
+        return response()->json([
+            'message' => 'タスクが正常に更新されました',
+            'task' => $task
+        ]);
     }
 
     /**
@@ -199,5 +207,25 @@ class TaskController extends Controller
         $task->delete();
 
         return response()->json(['message' => 'タスクが正常に削除されました']);
+    }
+
+    /**
+     * @OA\Delete(
+     *     path="/api/tasks",
+     *     summary="全てのタスク削除",
+     *     tags={"Tasks"},
+     *     @OA\Response(
+     *         response=200,
+     *         description="全てのタスクが正常に削除されました",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="全てのタスクが正常に削除されました")
+     *         )
+     *     )
+     * )
+     */
+    public function destroyAll()
+    {
+        Task::truncate();
+        return response()->json(['message' => '全てのタスクが正常に削除されました']);
     }
 }

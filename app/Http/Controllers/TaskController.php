@@ -36,7 +36,7 @@ class TaskController extends Controller
      * )
      * 
      * @OA\Post(
-     *     path="/tasks",
+     *     path="/api/tasks",
      *     summary="タスク作成",
      *     tags={"Tasks"},
      *     @OA\RequestBody(
@@ -74,7 +74,7 @@ class TaskController extends Controller
 
     /**
      * @OA\Get(
-     *     path="/tasks",
+     *     path="/api/tasks",
      *     summary="タスク一覧取得",
      *     tags={"Tasks"},
      *     @OA\Response(
@@ -95,7 +95,7 @@ class TaskController extends Controller
 
     /**
      * @OA\Get(
-     *     path="/tasks/{id}",
+     *     path="/api/tasks/{id}",
      *     summary="タスク詳細取得",
      *     tags={"Tasks"},
      *     @OA\Parameter(
@@ -123,7 +123,7 @@ class TaskController extends Controller
 
     /**
      * @OA\Put(
-     *     path="/tasks/{id}",
+     *     path="/api/tasks/{id}",
      *     summary="タスク更新",
      *     tags={"Tasks"},
      *     @OA\Parameter(
@@ -171,7 +171,7 @@ class TaskController extends Controller
 
     /**
      * @OA\Delete(
-     *     path="/tasks/{id}",
+     *     path="/api/tasks/{id}",
      *     summary="タスク削除",
      *     tags={"Tasks"},
      *     @OA\Parameter(

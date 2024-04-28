@@ -38,6 +38,14 @@ jobs:
         run: npm ci
       - name: Install Playwright Browsers
         run: npx playwright install --with-deps
+      - name: Execute migrations
+        run: php artisan migrate --seed
+      - name: Execute server
+        run: php artisan serve &
+        env:
+          APP_ENV: testing
+          APP_DEBUG: true
+          APP_KEY: base64:q1J
       - name: Run Playwright tests
         run: npx playwright test
       - uses: actions/upload-artifact@v4
@@ -46,3 +54,5 @@ jobs:
           name: playwright-report
           path: playwright-report/
           retention-days: 30
+      - name: Stop server
+        run: kill $(lsof -t -i:8000)

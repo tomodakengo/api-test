@@ -24,6 +24,18 @@ test.describe("Todo app API testing", () => {
         await request.delete(endPoint);
     });
 
+    test.beforeEach(async ({ request }) => {
+        const response = await request.post(endPoint, {
+            data: {
+                title: "Buy milk",
+                description: "Buy milk from the store",
+            },
+        });
+
+        const newTodo: ResponseTodoWithMessage = await response.json();
+        taskId = newTodo.task.id;
+    });
+
     test.afterAll(async ({ request }) => {
         await request.delete(endPoint);
     });

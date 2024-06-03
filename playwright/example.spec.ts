@@ -1,87 +1,84 @@
 import { chromium, test, expect } from "@playwright/test";
 
-const baseURL = "http://127.0.0.1:8000";
-const endPoint = "/api/tasks";
+const endPoint = "http://127.0.0.1:8000/api/tasks";
+
+interface ResponseTodoWithMessage {
+    message: string;
+    task: Task;
+}
+
+interface Task {
+    id: number;
+    title: string;
+    description: string;
+    created_at: string;
+    updated_at: string;
+}
+
 
 test.describe("Todo app API testing", () => {
-    test.beforeAll(async () => {
-        const browser = await chromium.launch();
-        const page = await browser.newPage();
-        await page.evaluate(
-            ({ baseURL, endPoint }) => {
-                return fetch(baseURL + endPoint, {
-                    method: "DELETE",
-                    headers: { "Content-Type": "application/json" },
-                }).then((res) => res.json());
-            },
-            { baseURL, endPoint },
-        );
-        await page.close();
+
+    let taskId: number;
+
+    test.beforeAll(async ({ request }) => {
+        await request.delete(endPoint);
     });
 
-    test("should be able to add a todo", async ({ page }) => {
-        const response = await page.evaluate(
-            ({ baseURL, endPoint }) => {
-                return fetch(baseURL + endPoint, {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                        title: "Buy milk",
-                        description: "Buy milk from the store",
-                    }),
-                }).then((res) => res.json());
-            },
-            { baseURL, endPoint },
-        );
-
-        expect(response).toBeDefined();
-        expect(response.message).toBe("タスクが正常に作成されました");
+    test.afterAll(async ({ request }) => {
+        await request.delete(endPoint);
     });
 
-    test("should be able to get all todo", async ({ page }) => {
-        const response = await page.evaluate(
-            ({ baseURL, endPoint }) => {
-                return fetch(baseURL + endPoint).then((res) => res.json());
+    test.beforeEach(async ({ request }) => {
+        const response = await request.post(endPoint, {
+            data: {
+                title: "Buy milk",
+                description: "Buy milk from the store",
             },
-            { baseURL, endPoint },
-        );
+        });
 
-        expect(response).toBeDefined();
-        console.log(response);
+        taskId = (await response.json()).task.id;
     });
 
-    test("should be able to update a todo", async ({ page }) => {
-        const response = await page.evaluate(
-            ({ baseURL, endPoint }) => {
-                return fetch(baseURL + endPoint, {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                        title: "Buy milk",
-                        description: "Buy milk from the store",
-                    }),
-                }).then((res) => res.json());
-            },
-            { baseURL, endPoint },
-        );
+    test("should be able to add a todo", async ({ request }) => {
 
-        expect(response).toBeDefined();
-        const todoId = response.task.id;
-        const updateResponse = await page.evaluate(
-            ({ baseURL, endPoint, todoId }) => {
-                return fetch(baseURL + endPoint + `/${todoId}`, {
-                    method: "PUT",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                        title: "Buy juice",
-                        description: "Buy juice from the amazon",
-                    }),
-                }).then((res) => res.json());
+        const response = await request.post(endPoint, {
+            data: {
+                title: "Buy milk",
+                description: "Buy milk from the store",
             },
-            { baseURL, endPoint, todoId },
-        );
+        });
 
-        expect(updateResponse).toBeDefined();
-        expect(updateResponse.message).toBe("タスクが正常に更新されました");
+        const newTodo: ResponseTodoWithMessage = await response.json();
+
+        expect(newTodo).toBeDefined();
+        expect(newTodo.message).toBe("タスクが正常に作成されました");
+    });
+
+    test("should be able to get all todo", async ({ request }) => {
+        const response = await request.get(endPoint);
+
+        const todos: Task[] = await response.json();
+
+        expect(todos).toBeDefined();
+
+        expect(todos[0]).toHaveProperty("id");
+        expect(todos[0]).toHaveProperty("title");
+        expect(todos[0]).toHaveProperty("description");
+
+    });
+
+    test("should be able to update a todo", async ({ request }) => {
+
+        const response = await request.put(endPoint + `/${taskId}`, {
+            data: {
+                title: "Buy juice",
+                description: "Buy juice from the amazon",
+            },
+        });
+
+        const updateTodo: ResponseTodoWithMessage = await response.json();
+
+        expect(updateTodo).toBeDefined();
+        expect(updateTodo.message).toBe("タスクが正常に更新されました");
     });
 });

@@ -1,0 +1,20 @@
+{
+    "private": true,
+    "type": "module",
+    "scripts": {
+        "dev": "vite",
+        "build": "vite build"
+    },
+    "devDependencies": {
+        "@eslint/js": "^9.1.1",
+        "@playwright/test": "^1.43.1",
+        "@types/node": "^20.12.7",
+        "axios": "^1.6.4",
+        "eslint": "^8.57.0",
+        "globals": "^15.0.0",
+        "laravel-vite-plugin": "^1.0",
+        "prettier": "3.2.5",
+        "typescript-eslint": "^7.7.1",
+        "vite": "^5.0"
+    }
+}
